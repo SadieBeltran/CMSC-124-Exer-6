@@ -17,3 +17,9 @@ Question: When do I get input to send to the other node?
 If either N1 or N2 sends "bye", disconnect and stop waiting for node.
 
 When one of the nodes send a message, ping the other node.  
+
+### WHAT IF
+N1 inits chat, pings N2 with their pingID
+N2 inits chat, pings N1 with their pingID
+Make function where N1 just sends stuff to N2 and vice versa
+And another separate function wherein if N1 or N2 receives a message they print it out?

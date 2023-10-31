@@ -7,7 +7,7 @@ init_chat() ->
 
 pong(Name, Msg) ->
     {ok, Msg} = io:read("~p: ", [Name]),
-    Ping_Pid ! {pong, Name, Msg},
+    Ping_Pid ! {pong, Name, Msg}, %thinking maybe move this somewhere after receive?
     receive
         {ping, Ping_Pid, Name2, "bye"} ->
             io:format("~p: bye", [Name2]),
