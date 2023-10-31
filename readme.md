@@ -5,3 +5,4 @@
 
 # TODO
 - Make a function that allows two nodes to ping pong with each other
+- Node must terminate at bye
