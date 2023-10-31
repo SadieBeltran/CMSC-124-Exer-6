@@ -6,3 +6,14 @@
 # TODO
 - Make a function that allows two nodes to ping pong with each other
 - Node must terminate at bye
+
+
+## flow
+N1 inits chat -> get name from N1
+N2 inits chat2 -> getname from N2
+
+Question: When do I get input to send to the other node?
+
+If either N1 or N2 sends "bye", disconnect and stop waiting for node.
+
+When one of the nodes send a message, ping the other node.  
