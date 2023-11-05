@@ -2,10 +2,10 @@
 -compile(export_all).
 
 init_chat() -> 
-    User2 = string:strip(io:get_line('Enter your name: '), right, $\n),     %% Remove \n in name (Reference: https://stackoverflow.com/a/18573368)
+    User2 = string:strip(io:get_line('Enter your name: '), right, $\n),     %% removes '\n' in name (Reference: https://stackoverflow.com/a/18573368)
     register(pong, spawn(maybe, pong, [User2])).
 
-%% Continuous asking for message input
+%% continuous asking for message input
 pong(User2, Ping_Pid) ->
     Message = io:get_line("You: "),
     if
@@ -36,10 +36,10 @@ pong(User2) ->
 pongLeave(Ping_Pid) ->
     Ping_Pid ! bye,
     io:format("You left the chat~n"),
-    halt(1).                    % terminate process
+    halt(1).  % terminate process
 
 init_chat2(Pong_Node) ->
-    User1 = string:strip(io:get_line('Enter your name: '), right, $\n),     %% Remove \n in name (Reference: https://stackoverflow.com/a/18573368)
+    User1 = string:strip(io:get_line('Enter your name: '), right, $\n),     %% removes '\n' in name (Reference: https://stackoverflow.com/a/18573368)
     spawn(maybe, ping, [User1, Pong_Node]).
 
 % sending Pid to pong user
@@ -63,8 +63,8 @@ ping1(User1, Pong_Node) ->
 
 % continuous asking for message input
 ping2(User1, Pong_Node) -> 
-    Message = io:get_line("You: "),
     if
+    Message = io:get_line("You: "),
         Message == "\n" ->  % ignores the empty message
             ping2(User1, Pong_Node);
         Message == "bye\n" -> pingLeave(Pong_Node);
@@ -78,4 +78,4 @@ ping2(User1, Pong_Node) ->
 pingLeave(Pong_Node) ->
     {pong, Pong_Node} ! bye,
     io:format("You left the chat~n"),
-    halt(1).                % terminate process
+    halt(1).   % terminate process
