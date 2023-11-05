@@ -2,34 +2,80 @@
 -compile(export_all).
 
 init_chat() -> 
-    {ok, Name} = io:read("Enter your Name: "),
-    register(pong, spawn(maybe, pong, [Name, ""])).
+    User2 = string:strip(io:get_line('Enter your name: '), right, $\n),     %% Remove \n in name (Reference: https://stackoverflow.com/a/18573368)
+    register(pong, spawn(maybe, pong, [User2])).
 
-pong(Name, Msg) ->
-    {ok, Msg} = io:read("~p: ", [Name]),
-    Ping_Pid ! {pong, Name, Msg}, %thinking maybe move this somewhere after receive?
-    receive
-        {ping, Ping_Pid, Name2, "bye"} ->
-            io:format("~p: bye", [Name2]),
-            io:format("Your partner disconnected");
-        {ping, Ping_Pid, Name2, Msg2} ->
-            io:format("~p: ~p", [Name2], [Msg2]),
-            pong(Name, Msg)
+%% Continuous asking for message input
+pong(User2, Ping_Pid) ->
+    Message = io:get_line("You: "),
+    if
+        Message == "\n" -> 
+            pong(User2, Ping_Pid);
+        Message == "bye\n" -> pongLeave(Ping_Pid);
+        Message /= "bye\n" -> 
+            Ping_Pid ! {User2, Message},
+            pong(User2, Ping_Pid)
     end.
+
+%% continuous asking for message input
+%% prints the received message from the other node
+pong(User2) ->
+    receive
+        bye ->
+            io:format("Your partner disconnected~n"),
+            halt(1);
+        {User1, RcvMessage1} -> 
+            io:format("~s: ~s", [User1, RcvMessage1]);
+        Ping_Pid ->
+            Ping_Pid ! pong,
+            spawn(maybe, pong, [User2, Ping_Pid])
+    end,
+    pong(User2).
+
+% when the message sent is "bye"
+pongLeave(Ping_Pid) ->
+    Ping_Pid ! bye,
+    io:format("You left the chat~n"),
+    halt(1).                    % terminate process
 
 init_chat2(Pong_Node) ->
-    {ok, Name} = io:read("Enter your Name: "),
-    spawn(maybe, ping, [Pong_Node, Name, ""]).
+    User1 = string:strip(io:get_line('Enter your name: '), right, $\n),     %% Remove \n in name (Reference: https://stackoverflow.com/a/18573368)
+    spawn(maybe, ping, [User1, Pong_Node]).
 
-ping(Pong_Node, Name, Msg) ->
-    {ok, Msg} = io:read("~p: ", [Name]),
-    {pong, Pong_Node} ! {ping, self(), Name, Msg},
+% sending Pid to pong user
+ping(User1, Pong_Node) ->
+    {pong, Pong_Node} ! self(),  
+    ping1(User1, Pong_Node).
+
+% continuous receiving message
+% prints the received message from the other node
+ping1(User1, Pong_Node) ->
     receive
-        {pong, Name2, Msg2} ->
-            io:format("~p: ~p~n",[Name2], [Msg2]),
-            ping(Pong_Node, Name, Msg);
-        {pong, Name2, "bye"} ->
-            io:format("~p: bye", [Name2]),
-            io:format("Your partner disconnected")
-    end.
+        pong ->
+            spawn(maybe, ping2, [User1, Pong_Node]);
+        bye ->
+            io:format("Your partner disconnected~n"),
+            halt(1);
+        {User2, RcvMessage2} ->
+            io:format("~s: ~s", [User2, RcvMessage2])
+    end,
+    ping1(User1, Pong_Node).
 
+% continuous asking for message input
+ping2(User1, Pong_Node) -> 
+    Message = io:get_line("You: "),
+    if
+        Message == "\n" ->  % ignores the empty message
+            ping2(User1, Pong_Node);
+        Message == "bye\n" -> pingLeave(Pong_Node);
+        Message /= "bye\n" -> 
+            {pong, Pong_Node} ! {User1, Message},       % sends message to pong node
+            ping2(User1, Pong_Node)                     
+        
+    end.
+    
+%% when the message sent is "bye"
+pingLeave(Pong_Node) ->
+    {pong, Pong_Node} ! bye,
+    io:format("You left the chat~n"),
+    halt(1).                % terminate process
