@@ -1,3 +1,11 @@
+%% Authors: Beltran, Samantha Elysse
+%%          Somoson, Lea Marie
+%
+%% Contributions:
+%% Beltran - Connected two nodes, disconnected two nodes when one node send a message "bye", tried to implement the bonus
+%% Somoson - Implemented message sending but waits for the reply of the other node, implemented message sending and does not wai
+%%           for the reply of the other node.
+
 -module(somonsonbeltran).
 -compile(export_all).
 
@@ -23,14 +31,13 @@ pong(User2, Ping_Pid) ->
     end.
 
 %% continuous asking for message input
-%% prints the received message from the other node
 pong(User2) ->
     receive
         bye ->
             io:format("Your partner disconnected~n"),
             halt(1);
         {User1, RcvMessage1} -> 
-            io:format("~s: ~s", [User1, RcvMessage1]);
+            io:format("~s: ~s", [User1, RcvMessage1]);  %% prints the received message from the other node
         Ping_Pid ->
             Ping_Pid ! pong,
             spawn(somonsonbeltran, pong, [User2, Ping_Pid])
@@ -56,7 +63,6 @@ ping(User1, [], Pong_Nodes) ->
     ping1(User1, Pong_Nodes).
 
 % continuous receiving message
-% prints the received message from the other node
 ping1(User1, Pong_Node) ->
     receive
         pong ->
@@ -65,7 +71,7 @@ ping1(User1, Pong_Node) ->
             io:format("Your partner disconnected~n"),
             halt(1);
         {User2, RcvMessage2} ->
-            io:format("~s: ~s", [User2, RcvMessage2])
+            io:format("~s: ~s", [User2, RcvMessage2])  % prints the received message from the other node
     end,
     ping1(User1, Pong_Node).
 
