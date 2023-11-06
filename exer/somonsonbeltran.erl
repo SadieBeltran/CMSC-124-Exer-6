@@ -1,10 +1,14 @@
--module(maybe).
+-module(somonsonbeltran).
 -compile(export_all).
+
+% CMSC 124 - ST-1L 
+% LEA MARIE SOMONSON - wrote the sending messages feature until 'bye'
+% ELYSSE SAMANTHA T. BELTRAN - connected the two nodes and attempted the bonus exercise.
 
 init_chat() -> 
     User2 = string:strip(io:get_line('Enter your name: '), right, $\n),     %% removes '\n' in name (Reference: https://stackoverflow.com/a/18573368)
     io:format("~p started a chatroom,", [User2]),
-    register(pong, spawn(maybe, pong, [User2])).
+    register(pong, spawn(somonsonbeltran, pong, [User2])).
 
 %% continuous asking for message input
 pong(User2, Ping_Pid) ->
@@ -29,7 +33,7 @@ pong(User2) ->
             io:format("~s: ~s", [User1, RcvMessage1]);
         Ping_Pid ->
             Ping_Pid ! pong,
-            spawn(maybe, pong, [User2, Ping_Pid])
+            spawn(somonsonbeltran, pong, [User2, Ping_Pid])
     end,
     pong(User2).
 
@@ -41,7 +45,7 @@ pongLeave(Ping_Pid) ->
 
 init_chat2(Pong_Node) ->
     User1 = string:strip(io:get_line('Enter your name: '), right, $\n),     %% removes '\n' in name (Reference: https://stackoverflow.com/a/18573368)
-    spawn(maybe, ping, [User1, Pong_Node, Pong_Node]).
+    spawn(somonsonbeltran, ping, [User1, Pong_Node, Pong_Node]).
 
 % sending Pid to pong user
 ping(User1, [Pong_Node | T], Pong_Nodes) ->
@@ -56,7 +60,7 @@ ping(User1, [], Pong_Nodes) ->
 ping1(User1, Pong_Node) ->
     receive
         pong ->
-            spawn(maybe, ping2, [User1, Pong_Node]);
+            spawn(somonsonbeltran, ping2, [User1, Pong_Node]);
         bye ->
             io:format("Your partner disconnected~n"),
             halt(1);
@@ -96,4 +100,4 @@ pingLeave([T | []]) ->
 
 init_chat3(Nodes) ->
     User1 = string:strip(io:get_line('Enter your name: '), right, $\n),
-    spawn(maybe, ping, [User1, Nodes, Nodes]).
+    spawn(somonsonbeltran, ping, [User1, Nodes, Nodes]).

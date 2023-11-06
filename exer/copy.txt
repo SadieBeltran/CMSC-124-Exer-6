@@ -1,0 +1,13 @@
+net_adm:ping(mr@Nao). c(maybe). maybe:init_chat(). X
+
+c(maybe). maybe:init_chat2(nodes()). M
+
+net_adm:ping(mr@Nao). c(u). u:init_chat(). X
+
+c(u). u:init_chat2(nodes()). M
+
+net_adm:ping(mr@Nao). net_adm:ping(xm@Nao). net_adm:ping(cwn@Nao).
+
+c(maybe). maybe:init_chat(). X
+c(maybe). maybe:init_chat2(nodes()). M
+c(maybe). maybe:init_chat3(). C
